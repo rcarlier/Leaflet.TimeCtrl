@@ -63,7 +63,8 @@ let options = {
         value: null, // null to NOT show sum of values (for current selection)
     },
     circle: {
-        // If `mini` and `maxi` are different, the circles are drawn proportionally to the value
+        // If `mini` and `maxi` are different, the circles are drawn
+        // proportionally to the value
         mini: 6, // minimum size of circle
         maxi: 6, // maximum size of circle
         color: "#FF0000", // circle outline color
