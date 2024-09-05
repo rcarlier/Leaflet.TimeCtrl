@@ -120,15 +120,16 @@ L.timeCtrl(data).addTo(map);
 
 `examples/mass_killing.html`
 
-Note: this plugin was finalized on September 5, 2024, the day after the Winder tragedy. This example was retained in memory of the victims.
+Note: this plugin was finalized on September 5, 2024, the day after the Winder tragedy. This example was retained in memory of the victims (these, and all the others...).
 
 ![Texte](assets/mass_killing.png)
 
 #### Data source
 
 -   https://data.world/associatedpress/mass-killings-public
+    (I renamed/removed some columns of information)
 
-See also...
+On the same (sad) subject, you can also consult:
 
 -   https://cssh.northeastern.edu/sccj/mass-killing-database/
 -   https://www.theviolenceproject.org/mass-shooter-database/
@@ -147,7 +148,7 @@ See also...
         "city": "Winder",
         "state": "GA",
         "location": "School",
-        "narrative": "two students and two teachers were killed and nine others were injured ... "
+        "narrative": "2 students and 2 teachers were killed and 9 others were injured ... "
     }
 ]
 ```
