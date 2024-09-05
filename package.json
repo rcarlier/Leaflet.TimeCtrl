@@ -1,0 +1,21 @@
+{
+    "name": "leaflet-time-ctrl",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "directories": {
+        "example": "examples"
+    },
+    "scripts": {
+        "build:js": "uglifyjs src/leaflet.timeCtrl.js -c -m reserved=['L','timeCtrl','timeCtrl'] -o dist/leaflet.timeCtrl.min.js",
+        "build:css": "uglifycss src/leaflet.timeCtrl.css > dist/leaflet.timeCtrl.min.css",
+        "build": "npm run build:js && npm run build:css"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "uglify-js": "^3.17.4",
+        "uglifycss": "^0.0.29"
+    }
+}
