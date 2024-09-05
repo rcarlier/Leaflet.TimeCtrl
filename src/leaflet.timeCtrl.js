@@ -29,7 +29,6 @@ L.TimeCtrl = L.LayerGroup.extend({
         };
         this._opt = L.Util.extend({}, this.defaultOptions, options);
         this._validateOptions();
-
         this.bounds = null;
         this.yearSliderMini = null;
         this.yearSliderMaxi = null;

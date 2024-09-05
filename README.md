@@ -47,7 +47,12 @@ Data need to be structured as an array of object, with 3 dimensions : year, lat,
 ]
 ```
 
-<mark>@todo </mark> : Make `value` optional if using fixed size circles...
+<mark>@todo </mark>
+
+-   Make `value` optional if using fixed size circles...
+-   Make "one year" and "interval" optional, and specify which one you want (exact, interval, or both...)
+-   If you have both, choose the one you want by default
+-   Choose default year (mini || maxi) ?
 
 Options:
 
