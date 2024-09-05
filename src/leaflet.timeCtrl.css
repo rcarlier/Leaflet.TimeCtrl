@@ -2,16 +2,30 @@
     border: 1px solid black;
     background: rgba(255, 255, 255, 0.8);
     padding: 5px;
-    border-radius: 10px;
+    border-radius: 5px;
+    max-width: 250px;
+    line-height: 1.2;
 }
+
+.timeCtrl .timeCtrlTitle,
+.timeCtrl .timeCtrlLegend,
+.timeCtrl .timeCtrlValue,
+.timeCtrl .timeCtrlRows {
+    margin: 0.5em 0;
+    line-height: 1.1;
+}
+
 .timeCtrl .timeCtrlTitle {
     font-size: 1.5em;
-    margin: 2px;
 }
-.timeCtrl .timeCtrlYear {
-    font-size: 2em;
-    margin: 2px;
-    text-align: center;
+.timeCtrl .timeCtrlLegend {
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+.timeCtrl .timeCtrlValue,
+.timeCtrl .timeCtrlRows {
+    font-size: 1em;
 }
 
 .timeCtrl .timeCtrlYearSlider {
@@ -33,4 +47,7 @@
     font-size: 1.5em;
     width: 3em;
     text-align: center;
+}
+.leaflet-popup-content .timeCtrlPopup {
+    margin: 0.2em 0;
 }

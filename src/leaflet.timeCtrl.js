@@ -2,15 +2,23 @@ L.TimeCtrl = L.LayerGroup.extend({
     initialize: function (data, options) {
         this.defaultOptions = {
             text: {
+                position: "bottomleft",
                 title: null,
-                exact: "Exact",
+                legend: null,
+                exact: "One year",
                 inter: "Beetween",
+                rows: null,
+                value: null,
             },
             circle: {
                 mini: 6,
-                maxi: 12,
+                maxi: 6,
                 color: "#FF0000",
                 opacity: 0.5,
+                weight: 0.5,
+                fillColor: "#FF0000",
+                fillOpacity: 0.5,
+                popup: true,
             },
             data: {
                 year: "year",
@@ -43,14 +51,29 @@ L.TimeCtrl = L.LayerGroup.extend({
             this._opt.data.mini = Math.min(this._opt.data.mini, data[this._opt.data.value]);
             this._opt.data.maxi = Math.max(this._opt.data.mini, data[this._opt.data.value]);
         });
-        console.table(this._opt.data);
+
+        this.data.sort((a, b) => {
+            return b[this._opt.data.value] - a[this._opt.data.value];
+        });
+
         this.circleData = [];
+    },
+
+    onAdd: function (map) {
         this._map = map;
         this._createControl();
         this._createCircles();
         this._updateCircles();
+        L.LayerGroup.prototype.onAdd.call(this, map);
     },
+
     _validateType: function (parentAttr, attr, type) {
+        if (!this._opt[parentAttr]) {
+            this._opt[parentAttr] = null;
+        }
+        if (!(attr in this._opt[parentAttr])) {
+            this._opt[parentAttr][attr] = null;
+        }
         if (typeof this._opt[parentAttr][attr] !== type) {
             console.warn(
                 `${parentAttr}.${attr} option needs to be a ${type} ; default value applyed.`
@@ -60,30 +83,45 @@ L.TimeCtrl = L.LayerGroup.extend({
     },
 
     _validateOptions: function () {
+        this._validateType("text", "position", "string"); // @todo: verify "good" values
         this._validateType("text", "title", "string");
+        this._validateType("text", "legend", "string");
         this._validateType("text", "exact", "string");
         this._validateType("text", "inter", "string");
+        this._validateType("text", "rows", "string");
+        this._validateType("text", "value", "string");
+
         this._validateType("circle", "mini", "number");
         this._validateType("circle", "maxi", "number");
         this._validateType("circle", "color", "string");
         this._validateType("circle", "opacity", "number");
+        this._validateType("circle", "weight", "number");
+        this._validateType("circle", "fillColor", "string");
+        this._validateType("circle", "fillOpacity", "number");
+        this._validateType("circle", "popup", "boolean");
+        // names of fields
         this._validateType("data", "year", "string");
         this._validateType("data", "lat", "string");
         this._validateType("data", "lng", "string");
+        this._validateType("data", "value", "string");
         this._validateType("data", "value", "string");
     },
 
     _createCircles: function () {
         this.bounds = L.latLngBounds();
         this.data.forEach((data) => {
-            const dataMin = this._opt.data.mini;
-            const dataMax = this._opt.data.maxi;
-            const circleMin = this._opt.circle.mini;
-            const circleMax = this._opt.circle.maxi;
-            const dataValue = data[this._opt.data.value];
-            const normalizedValue = (dataValue - dataMin) / (dataMax - dataMin);
-            const logValue = Math.log1p(normalizedValue * 9);
-            const radius = circleMin + (circleMax - circleMin) * logValue;
+            let radius = 0;
+            if (this._opt.data.mini != this._opt.data.max) {
+                const normalizedValue =
+                    (data[this._opt.data.value] - this._opt.data.mini) /
+                    (this._opt.data.maxi - this._opt.data.mini);
+                radius =
+                    this._opt.circle.mini +
+                    (this._opt.circle.maxi - this._opt.circle.mini) * normalizedValue;
+                radius = Math.max(this._opt.circle.mini, Math.min(this._opt.circle.maxi, radius));
+            } else {
+                radius = this._opt.circle.mini;
+            }
 
             let circle = L.circleMarker([data[this._opt.data.lat], data[this._opt.data.lng]], {
                 color: this._opt.circle.color,
@@ -92,13 +130,16 @@ L.TimeCtrl = L.LayerGroup.extend({
                 fillOpacity: this._opt.circle.fillOpacity,
                 weight: this._opt.circle.weight,
                 radius: radius,
+                interactive: this._opt.circle.popup,
             });
-            let popupContent = "";
-            for (let key in data) {
-                popupContent += "<b>" + key + ":</b> " + data[key] + "<br>";
-            }
-            circle.bindPopup(popupContent);
 
+            if (this._opt.circle.popup) {
+                let popupContent = "";
+                for (let key in data) {
+                    popupContent += `<div class="timeCtrlPopup"><b>${key}</b>: ${data[key]}</div>`;
+                }
+                circle.bindPopup(popupContent);
+            }
             this.circleData.push({
                 circle: circle,
                 data: data,
@@ -109,16 +150,23 @@ L.TimeCtrl = L.LayerGroup.extend({
     },
 
     _createControl: function () {
-        this.timeControl = L.control({ position: "bottomright" });
+        this.timeControl = L.control({ position: this._opt.text.position });
         this.timeControl.onAdd = () => {
             let div = L.DomUtil.create("div", "timeCtrl");
 
-            const title = this._opt.text.title || "Significant Earthquakes";
             let titleDiv = L.DomUtil.create("div");
-            titleDiv.innerHTML = `
-                <p class="timeCtrlTitle">${title}</p>
-                <p id="yearLabel" class="timeCtrlYear"</p>
+            titleDiv.innerHTML = ``;
+            if (this._opt.text.title != null)
+                titleDiv.innerHTML += `<div class="timeCtrlTitle">${this._opt.text.title}</div>`;
+
+            if (this._opt.text.legend != null)
+                titleDiv.innerHTML += `<div class="timeCtrlLegend">${this._opt.text.legend}</div>`;
+
+            titleDiv.innerHTML += `
+                <div id="rowsLabel" class="timeCtrlRows"></div>
+                <div id="valueLabel" class="timeCtrlValue"></div>
             `;
+
             div.appendChild(titleDiv);
             let divMini = L.DomUtil.create("div");
             divMini.innerHTML = `
@@ -161,11 +209,11 @@ L.TimeCtrl = L.LayerGroup.extend({
                 <div class="timeCtrlRadio">
                     <label>
                     <input type="radio" id="timeCtrlViewE" name="timeCtrlView" value="exact"  />
-                    Exact
+                    ${this._opt.text.exact}
                     </label>
                     <label>
                     <input type="radio" id="timeCtrlViewC" name="timeCtrlView" value="intervale" checked />
-                    Interval
+                    ${this._opt.text.inter}
                     </label>
                 </div>
                 `;
@@ -205,9 +253,24 @@ L.TimeCtrl = L.LayerGroup.extend({
     },
 
     _updateUi: function () {
-        document.querySelector("#yearLabel").innerText = this.count;
         document.querySelector("#yearOutputMini").innerText = this.yearSliderMini.value;
         document.querySelector("#yearOutputMaxi").innerText = this.yearSliderMaxi.value;
+
+        if (this._opt.text.rows === null) {
+            document.querySelector("#rowsLabel").style.display = "none";
+        } else {
+            document.querySelector(
+                "#rowsLabel"
+            ).innerHTML = `${this._opt.text.rows}: <b>${this.count}</b>`;
+        }
+
+        if (this._opt.text.value === null) {
+            document.querySelector("#valueLabel").style.display = "none";
+        } else {
+            document.querySelector(
+                "#valueLabel"
+            ).innerHTML = `${this._opt.text.value}: <b>${this.total}</b>`;
+        }
 
         let opt = document.querySelector('input[name="timeCtrlView"]:checked');
         if (opt.value == "exact") {
@@ -219,9 +282,9 @@ L.TimeCtrl = L.LayerGroup.extend({
 
     _updateCircles: function () {
         let option = document.querySelector('input[name="timeCtrlView"]:checked').value;
-        console.table(this._opt.data);
 
         this.count = 0;
+        this.total = 0;
         this.circleData.forEach((value) => {
             // console.log(value);
             let circle = value.circle;
@@ -230,6 +293,7 @@ L.TimeCtrl = L.LayerGroup.extend({
             if (option === "exact") {
                 if (data[this._opt.data.year] == this.yearSliderMini.value) {
                     this.count++;
+                    this.total += data[this._opt.data.value];
                     map.addLayer(circle);
                 } else {
                     map.removeLayer(circle);
@@ -240,6 +304,8 @@ L.TimeCtrl = L.LayerGroup.extend({
                     data[this._opt.data.year] <= this.yearSliderMaxi.value
                 ) {
                     this.count++;
+                    this.total += data[this._opt.data.value];
+
                     map.addLayer(circle);
                 } else {
                     map.removeLayer(circle);

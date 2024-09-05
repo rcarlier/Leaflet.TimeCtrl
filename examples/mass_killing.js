@@ -16,24 +16,29 @@ let circleData = [];
 function showData(data) {
     L.timeCtrl(data, {
         text: {
-            title: "Mass Killing in America",
+            position: "topright",
+            title: "Mass shootings in the<br>United States",
+            legend: "The size of the circles is proportional to the number of victims killed. From 2006 (janv) to 2024 (sept).",
             exact: "By Year",
             inter: "For the period",
+            rows: "Incidents",
+            value: "Deaths",
         },
         circle: {
             mini: 3,
-            maxi: 7,
+            maxi: 10,
             color: "#000",
             opacity: 0.5,
+            weight: 0.5,
             fillColor: "#FF0000",
             fillOpacity: 0.5,
-            weight: 0.5,
+            popup: true,
         },
         data: {
-            year: "year", // name of year field
-            lat: "latitude", // name of lat field
-            lng: "longitude", // name of lng field
-            value: "killed", // name of value field
+            year: "year",
+            lat: "latitude",
+            lng: "longitude",
+            value: "killed",
         },
-    });
+    }).addTo(map);
 }

@@ -11,28 +11,19 @@ fetch("earthquakes.json")
         showData(data);
     });
 
-let circleData = [];
-
 function showData(data) {
-    L.timeCtrl(data, {
-        text: {
-            title: "Tremblements de terre<br>au Japon",
-            exact: "1 année",
-            inter: "Intervalle",
-        },
-        circle: {
-            mini: 0.5,
-            maxi: 4,
-            color: "#000",
-            opacity: 1,
-            weight: 0.5,
-            fillColor: "#00F0F0",
-            fillOpacity: 0.25,
-        },
-        data: {
-            lat: "lat", // name of lat field
-            lng: "lng", // name of lng field
-            value: "mag", // name of value field
-        },
-    });
+    //  // Some tests...
+    // data = [
+    //     {
+    //         lat: 25.967,
+    //         lng: 143.332,
+    //         year: 1905,
+    //     },
+    //     {
+    //         lat: 33.715,
+    //         lng: 131.759,
+    //         year: 1905,
+    //     },
+    // ];
+    L.timeCtrl(data).addTo(map);
 }
